@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 
@@ -529,3 +530,7 @@
   </body>
 </html>
 
+=======
+# repytor
+A reverse http encrypted and toryfied shell ( and listener )
+>>>>>>> 8c9ed0281f185668d7ed347a80e56f70f0efdeae
